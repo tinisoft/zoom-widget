@@ -11,34 +11,35 @@ typedef ZoomWidgetBuilder = Widget Function(
 
 @immutable
 class Zoom extends StatefulWidget {
-  Zoom({
-    this.backgroundColor = Colors.grey,
-    this.canvasColor = Colors.white,
-    this.centerOnScale = true,
-    required this.child,
-    this.colorScrollBars = Colors.black12,
-    this.doubleTapAnimDuration = const Duration(milliseconds: 300),
-    this.doubleTapScaleChange = 1.1,
-    this.doubleTapZoom = true,
-    this.enableScroll = true,
-    this.initPosition,
-    this.initScale,
-    this.initTotalZoomOut = false,
-    Key? key,
-    this.maxScale = 2.5,
-    this.maxZoomHeight,
-    this.maxZoomWidth,
-    this.onPositionUpdate,
-    this.onScaleUpdate,
-    this.onPanUpPosition,
-    this.onMinZoom,
-    this.onTap,
-    this.opacityScrollBars = 0.5,
-    this.radiusScrollBars = 4,
-    this.scrollWeight = 10,
-    this.transformationController,
-    this.zoomSensibility = 1.0,
-  })  : assert(maxScale > 0),
+  Zoom(
+      {this.backgroundColor = Colors.grey,
+      this.canvasColor = Colors.white,
+      this.centerOnScale = true,
+      required this.child,
+      this.colorScrollBars = Colors.black12,
+      this.doubleTapAnimDuration = const Duration(milliseconds: 300),
+      this.doubleTapScaleChange = 1.1,
+      this.doubleTapZoom = true,
+      this.enableScroll = true,
+      this.initPosition,
+      this.initScale,
+      this.initTotalZoomOut = false,
+      Key? key,
+      this.maxScale = 2.5,
+      this.maxZoomHeight,
+      this.maxZoomWidth,
+      this.onPositionUpdate,
+      this.onScaleUpdate,
+      this.onPanUpPosition,
+      this.onMinZoom,
+      this.onTap,
+      this.opacityScrollBars = 0.5,
+      this.radiusScrollBars = 4,
+      this.scrollWeight = 10,
+      this.transformationController,
+      this.zoomSensibility = 1.0,
+      this.freeze = false})
+      : assert(maxScale > 0),
         assert(!maxScale.isNaN),
         super(key: key);
 
@@ -67,6 +68,7 @@ class Zoom extends StatefulWidget {
   final double scrollWeight;
   final TransformationController? transformationController;
   final double zoomSensibility;
+  bool freeze;
 
   static Vector3 getNearestPointOnLine(Vector3 point, Vector3 l1, Vector3 l2) {
     final double lengthSquared = math.pow(l2.x - l1.x, 2.0).toDouble() +
@@ -481,6 +483,7 @@ class _ZoomState extends State<Zoom>
   }
 
   bool _gestureIsSupported(_GestureType? gestureType) {
+    debugPrint("Gesture type: $gestureType");
     switch (gestureType) {
       case _GestureType.scale:
         return true;
@@ -502,6 +505,7 @@ class _ZoomState extends State<Zoom>
   }
 
   void _onScaleStart(ScaleStartDetails details) {
+    if (widget.freeze) return;
     if (_controller.isAnimating) {
       _controller.stop();
       _controller.reset();
@@ -518,6 +522,7 @@ class _ZoomState extends State<Zoom>
   }
 
   void _onScaleUpdate(ScaleUpdateDetails details) {
+    if (widget.freeze) return;
     final double scale = _transformationController!.value.getMaxScaleOnAxis();
     final Offset focalPointScene = _transformationController!.toScene(
       details.localFocalPoint,
@@ -576,6 +581,7 @@ class _ZoomState extends State<Zoom>
   }
 
   void _onScaleEnd(ScaleEndDetails details) {
+    if (widget.freeze) return;
     _scaleStart = null;
 
     _animation?.removeListener(_onAnimate);
@@ -622,6 +628,7 @@ class _ZoomState extends State<Zoom>
   }
 
   void _receivedPointerSignal(PointerSignalEvent event) {
+    if (widget.freeze) return;
     if (event is PointerScrollEvent) {
       if (event.scrollDelta.dy == 0.0) {
         return;
@@ -649,6 +656,7 @@ class _ZoomState extends State<Zoom>
   }
 
   void _onDoubleTap() {
+    if (widget.freeze) return;
     if (!_scaleController.isAnimating && widget.doubleTapZoom) {
       doubleTapZoomIn = _transformationController!.value.getMaxScaleOnAxis() <
           widget.maxScale;
@@ -939,6 +947,10 @@ class _ZoomState extends State<Zoom>
             widget.onPanUpPosition!(event.localPosition);
           }
         },
+        onPointerDown: (event) {
+          // print button details if it is mouse.
+          debugPrint("onPointerDown ${event.buttons}");
+        },
         child: (widget.maxZoomWidth == null || widget.maxZoomHeight == null)
             ? Container(
                 color: widget.canvasColor,
@@ -977,9 +989,9 @@ class _ZoomState extends State<Zoom>
             child: Listener(
               key: _parentKey,
               onPointerSignal: _receivedPointerSignal,
-              onPointerDown: (PointerDownEvent event) {
-                _doubleTapFocalPoint = event.localPosition;
-              },
+              // onPointerDown: (PointerDownEvent event) {
+              //   _doubleTapFocalPoint = event.localPosition;
+              // },
               child: GestureDetector(
                 behavior: HitTestBehavior.opaque,
                 onScaleEnd: _onScaleEnd,
