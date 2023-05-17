@@ -523,6 +523,9 @@ class _ZoomState extends State<Zoom>
 
   void _onScaleUpdate(ScaleUpdateDetails details) {
     if (widget.freeze) return;
+    if(_referenceFocalPoint == null) {
+        _referenceFocalPoint = details.focalPoint;
+    }
     final double scale = _transformationController!.value.getMaxScaleOnAxis();
     final Offset focalPointScene = _transformationController!.toScene(
       details.localFocalPoint,
