@@ -433,7 +433,7 @@ class _ZoomState extends State<Zoom>
   Matrix4 _matrixScale(Matrix4 matrix, double scale, {bool fixScale = false}) {
     double sensibleScale = scale > 1.0
         ? 1.0 + ((scale - 1.0) * widget.zoomSensibility)
-        : 1.0 - ((1.0 - scale) * widget.zoomSensibility);
+        : 0.1 - ((1.0 - scale) * widget.zoomSensibility);
     if (scale == 1.0) {
       return matrix.clone();
     }
