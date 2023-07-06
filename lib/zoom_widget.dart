@@ -489,7 +489,6 @@ class _ZoomState extends State<Zoom>
         return true;
 
       case _GestureType.pan:
-
       case null:
         return true;
     }
@@ -505,7 +504,6 @@ class _ZoomState extends State<Zoom>
   }
 
   void _onScaleStart(ScaleStartDetails details) {
-    if (widget.freeze) return;
     if (_controller.isAnimating) {
       _controller.stop();
       _controller.reset();
@@ -523,8 +521,8 @@ class _ZoomState extends State<Zoom>
 
   void _onScaleUpdate(ScaleUpdateDetails details) {
     if (widget.freeze) return;
-    if(_referenceFocalPoint == null) {
-        _referenceFocalPoint = details.focalPoint;
+    if (_referenceFocalPoint == null) {
+      _referenceFocalPoint = details.focalPoint;
     }
     final double scale = _transformationController!.value.getMaxScaleOnAxis();
     final Offset focalPointScene = _transformationController!.toScene(
