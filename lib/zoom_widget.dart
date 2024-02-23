@@ -1085,7 +1085,6 @@ class _ZoomBuilt extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    debugPrint("_ZoomBuilt ${matrix}");
     Widget child = Transform(
       transform: matrix,
       child: KeyedSubtree(
@@ -1111,9 +1110,7 @@ class _ZoomBuilt extends StatelessWidget {
 
 class TransformationController extends ValueNotifier<Matrix4> {
   TransformationController([Matrix4? value])
-      : super(value ?? Matrix4.identity()) {
-    debugPrint("TController: ${value}");
-  }
+      : super(value ?? Matrix4.identity());
 
   Offset toScene(Offset viewportPoint) {
     final Matrix4 inverseMatrix = Matrix4.inverted(value);
