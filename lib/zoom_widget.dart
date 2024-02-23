@@ -483,13 +483,12 @@ class _ZoomState extends State<Zoom>
   }
 
   bool _gestureIsSupported(_GestureType? gestureType) {
-    debugPrint("Gesture type: $gestureType");
+    //debugPrint("Gesture type: $gestureType");
     switch (gestureType) {
       case _GestureType.scale:
         return true;
 
       case _GestureType.pan:
-
       case null:
         return true;
     }
@@ -505,6 +504,10 @@ class _ZoomState extends State<Zoom>
   }
 
   void _onScaleStart(ScaleStartDetails details) {
+    //debugPrint("zoom: onScaleStart");
+    _referenceFocalPoint = _transformationController!.toScene(
+      details.localFocalPoint,
+    );
     if (widget.freeze) return;
     if (_controller.isAnimating) {
       _controller.stop();
@@ -522,9 +525,10 @@ class _ZoomState extends State<Zoom>
   }
 
   void _onScaleUpdate(ScaleUpdateDetails details) {
+    // debugPrint("zoom: onScaleUpdate");
     if (widget.freeze) return;
-    if(_referenceFocalPoint == null) {
-        _referenceFocalPoint = details.focalPoint;
+    if (_referenceFocalPoint == null) {
+      _referenceFocalPoint = details.focalPoint;
     }
     final double scale = _transformationController!.value.getMaxScaleOnAxis();
     final Offset focalPointScene = _transformationController!.toScene(
@@ -1081,6 +1085,7 @@ class _ZoomBuilt extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    debugPrint("_ZoomBuilt ${matrix}");
     Widget child = Transform(
       transform: matrix,
       child: KeyedSubtree(
@@ -1106,7 +1111,9 @@ class _ZoomBuilt extends StatelessWidget {
 
 class TransformationController extends ValueNotifier<Matrix4> {
   TransformationController([Matrix4? value])
-      : super(value ?? Matrix4.identity());
+      : super(value ?? Matrix4.identity()) {
+    debugPrint("TController: ${value}");
+  }
 
   Offset toScene(Offset viewportPoint) {
     final Matrix4 inverseMatrix = Matrix4.inverted(value);
