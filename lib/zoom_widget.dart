@@ -504,10 +504,11 @@ class _ZoomState extends State<Zoom>
   }
 
   void _onScaleStart(ScaleStartDetails details) {
-    //debugPrint("zoom: onScaleStart");
+    debugPrint("zoom: onScaleStart");
     _referenceFocalPoint = _transformationController!.toScene(
       details.localFocalPoint,
     );
+    _scaleStart = _transformationController!.value.getMaxScaleOnAxis();
     if (widget.freeze) return;
     if (_controller.isAnimating) {
       _controller.stop();
@@ -525,7 +526,7 @@ class _ZoomState extends State<Zoom>
   }
 
   void _onScaleUpdate(ScaleUpdateDetails details) {
-    // debugPrint("zoom: onScaleUpdate");
+    debugPrint("zoom: onScaleUpdate");
     if (widget.freeze) return;
     if (_referenceFocalPoint == null) {
       _referenceFocalPoint = details.focalPoint;
@@ -588,6 +589,7 @@ class _ZoomState extends State<Zoom>
   }
 
   void _onScaleEnd(ScaleEndDetails details) {
+    debugPrint("zoom: onScaleEnd");
     if (widget.freeze) return;
     _scaleStart = null;
 
